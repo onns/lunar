@@ -1,6 +1,8 @@
 package lunar
 
 import (
+	"errors"
+	"fmt"
 	"time"
 )
 
@@ -48,7 +50,7 @@ type Time struct {
 	year, month, day     int
 	hour, minute, second int
 	leap                 bool
-	location *time.Location
+	location             *time.Location
 }
 
 type Year struct {
@@ -90,16 +92,20 @@ func Parse(t time.Time) (lunar *Time) {
 }
 
 // AddDate TODO 目前只做了年份的
-func (t *Time) AddDate(years int, months int, days int) (res *Time) {
+func (t *Time) AddDate(years int, months int, days int) (res *Time, err error) {
 	res = &Time{
-		year:   t.year + years,
-		month:  t.month + months,
-		day:    t.day + days,
-		hour:   t.hour,
-		minute: t.minute,
-		second: t.second,
+		year:     t.year + years,
+		month:    t.month + months,
+		day:      t.day + days,
+		hour:     t.hour,
+		minute:   t.minute,
+		second:   t.second,
 		location: t.location,
-		leap:   false,
+		leap:     false,
+	}
+	if res.year > MaxYear || res.year < MinYear {
+		err = errors.New(fmt.Sprintf("year must between %+v and %+v", MinYear, MaxYear))
+		return
 	}
 	return
 }
